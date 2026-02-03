@@ -232,6 +232,9 @@ class POSSystem:
         while True:
             try:
                 amount_paid = float(input(f"Enter cash amount received: $"))
+                if amount_paid < 0:
+                    print("Amount cannot be negative. Please try again.")
+                    continue
                 if amount_paid < total:
                     print(f"Insufficient payment. Need ${total:.2f}, received ${amount_paid:.2f}")
                     continue
@@ -291,9 +294,11 @@ class POSSystem:
                 print(f"Amount due: ${difference:.2f}")
                 try:
                     amount_paid = float(input(f"Enter cash amount: $"))
-                    if amount_paid >= difference:
+                    if amount_paid < 0:
+                        print("Amount cannot be negative. Transaction cancelled.")
+                    elif amount_paid >= difference:
                         # Use all credit and pay difference in cash
-                        customer.credit = 0
+                        customer.deduct_credit(customer.credit)
                         self.save_customer(customer)
                         
                         cash_change = amount_paid - difference
@@ -307,7 +312,7 @@ class POSSystem:
                     else:
                         print("Insufficient payment. Transaction cancelled.")
                 except ValueError:
-                    print("Invalid amount. Transaction cancelled.")
+                    print("Invalid amount. Please enter a numeric value. Transaction cancelled.")
             else:
                 print("Transaction cancelled.")
 
@@ -339,8 +344,8 @@ def main():
                 continue
             try:
                 price = float(input("Enter item price: $"))
-                if price < 0:
-                    print("Price cannot be negative.")
+                if price <= 0:
+                    print("Price must be greater than zero.")
                     continue
                 pos.add_item(name, price)
             except ValueError:
