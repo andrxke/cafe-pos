@@ -72,17 +72,17 @@
 </div>
 
 <script>
-const items = {
-    {% for name, item in items.items() %}
-    "{{ name }}": {{ item.price }},
-    {% endfor %}
-};
+const items = {{ items|tojson }};
+const itemPrices = {};
+for (const [name, item] of Object.entries(items)) {
+    itemPrices[name] = item.price;
+}
 
 function updateTotal() {
     let total = 0;
     let orderItems = [];
     
-    for (const [name, price] of Object.entries(items)) {
+    for (const [name, price] of Object.entries(itemPrices)) {
         const qty = parseInt(document.getElementById('qty_' + name).value) || 0;
         if (qty > 0) {
             const notes = document.getElementById('notes_' + name).value;

@@ -49,10 +49,24 @@ http://localhost:5000
 
 ## Default Login
 
+**For first-time setup only:**
 - **Username**: `admin`
 - **Password**: `admin123`
 
-*Note: Change these credentials in production*
+**IMPORTANT**: These are default credentials for initial setup. In production:
+1. Change the default password immediately
+2. Set a strong SECRET_KEY environment variable
+3. Use HTTPS
+4. Run behind a proper WSGI server (gunicorn, waitress)
+
+## Security Notes
+
+- The default secret key should be changed in production via the `SECRET_KEY` environment variable
+- Passwords are hashed using Werkzeug's security functions
+- Always use HTTPS in production environments
+- Change default admin credentials on first login
+- Run with `FLASK_DEBUG=false` in production
+- Use a WSGI server (not the built-in Flask development server)
 
 ## Usage
 

@@ -16,7 +16,7 @@
                 <a href="{{ url_for('create_order') }}" class="btn-primary">New Order</a>
                 <a href="{{ url_for('items') }}">Menu Items</a>
                 <a href="{{ url_for('customers') }}">Customers</a>
-                <span class="nav-user">👤 {{ session.barista_name }}</span>
+                <span class="nav-user" aria-label="Current user">👤 {{ session.barista_name }}</span>
                 <a href="{{ url_for('logout') }}" class="btn-secondary">Logout</a>
             </div>
         </div>

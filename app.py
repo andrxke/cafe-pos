@@ -11,7 +11,9 @@ from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'cafe-pos-secret-key-change-in-production'
+# Secret key - CHANGE THIS IN PRODUCTION
+# Set via environment variable: export SECRET_KEY='your-secret-key-here'
+app.secret_key = os.environ.get('SECRET_KEY', 'cafe-pos-secret-key-change-in-production')
 
 # Data directory
 DATA_DIR = 'data'
@@ -393,10 +395,12 @@ def process_payment():
             return redirect(url_for('dashboard'))
             
         except ValueError as e:
-            flash(f'Invalid input: {str(e)}', 'error')
+            print(f"Payment processing error: {e}")  # Log for debugging
+            flash('Invalid payment information. Please check your input.', 'error')
             return render_template('payment.html', order=pending_order)
         except Exception as e:
-            flash(f'Error processing payment: {str(e)}', 'error')
+            print(f"Unexpected payment error: {e}")  # Log for debugging
+            flash('An unexpected error occurred. Please try again.', 'error')
             return render_template('payment.html', order=pending_order)
     
     # GET request - show payment form
@@ -416,4 +420,7 @@ def process_payment():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # WARNING: Only use debug mode in development
+    # In production, use a WSGI server like gunicorn or waitress
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='127.0.0.1', port=5000)

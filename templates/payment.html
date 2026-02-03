@@ -73,7 +73,7 @@
                 {% endif %}
                 
                 <script>
-                const totalAmount = {{ order.total }};
+                const totalAmount = {{ order.total|tojson }};
                 document.getElementById('amount_paid').addEventListener('input', function() {
                     const paid = parseFloat(this.value) || 0;
                     const change = paid - totalAmount;
