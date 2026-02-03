@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Create Order - Cafe POS{% endblock %}
+
+{% block content %}
+<div class="order-container">
+    <h1>Create New Order</h1>
+    
+    <form method="POST" action="{{ url_for('process_order') }}" class="order-form">
+        <div class="order-items">
+            <h2>Select Items</h2>
+            <div class="items-list">
+                {% for name, item in items.items()|sort %}
+                <div class="order-item-card">
+                    <div class="order-item-header">
+                        <h3>{{ item.name }}</h3>
+                        <span class="price">${{ "%.2f"|format(item.price) }}</span>
+                    </div>
+                    <div class="order-item-inputs">
+                        <div class="input-group">
+                            <label for="qty_{{ name }}">Quantity:</label>
+                            <input type="number" id="qty_{{ name }}" name="qty_{{ name }}" 
+                                   min="0" value="0" class="qty-input"
+                                   onchange="updateTotal()">
+                        </div>
+                        <div class="input-group input-group-full">
+                            <label for="notes_{{ name }}">Notes:</label>
+                            <input type="text" id="notes_{{ name }}" name="notes_{{ name }}"
+                                   placeholder="e.g., extra hot, no sugar" class="notes-input">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div id="order-preview">
+                <p class="empty-order">No items selected</p>
+            </div>
+            <div class="total-line">
+                <strong>Total:</strong>
+                <strong id="total-amount">$0.00</strong>
+            </div>
+            
+            <div class="payment-details">
+                <h3>Payment Details</h3>
+                <div class="form-group">
+                    <label for="customer_name">Customer Name (Optional)</label>
+                    <input type="text" id="customer_name" name="customer_name" 
+                           placeholder="Enter customer name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment_type">Payment Type</label>
+                    <select id="payment_type" name="payment_type">
+                        <option value="cash">Cash</option>
+                        <option value="credit">Customer Credit</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    Proceed to Payment →
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+const items = {{ items|tojson }};
+const itemPrices = {};
+for (const [name, item] of Object.entries(items)) {
+    itemPrices[name] = item.price;
+}
+
+function updateTotal() {
+    let total = 0;
+    let orderItems = [];
+    
+    for (const [name, price] of Object.entries(itemPrices)) {
+        const qty = parseInt(document.getElementById('qty_' + name).value) || 0;
+        if (qty > 0) {
+            const notes = document.getElementById('notes_' + name).value;
+            total += price * qty;
+            orderItems.push({
+                name: name,
+                qty: qty,
+                price: price,
+                notes: notes
+            });
+        }
+    }
+    
+    document.getElementById('total-amount').textContent = '$' + total.toFixed(2);
+    
+    const preview = document.getElementById('order-preview');
+    if (orderItems.length === 0) {
+        preview.innerHTML = '<p class="empty-order">No items selected</p>';
+    } else {
+        let html = '<ul class="order-items-list">';
+        orderItems.forEach(item => {
+            html += `<li>
+                <span>${item.name} x${item.qty}</span>
+                <span>$${(item.price * item.qty).toFixed(2)}</span>
+            `;
+            if (item.notes) {
+                html += `<br><small class="item-notes">Note: ${item.notes}</small>`;
+            }
+            html += '</li>';
+        });
+        html += '</ul>';
+        preview.innerHTML = html;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', updateTotal);
+</script>
+{% endblock %}
