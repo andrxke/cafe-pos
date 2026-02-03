@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Process Payment - Cafe POS{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <h1>Process Payment</h1>
+    
+    <div class="payment-layout">
+        <div class="order-review">
+            <h2>Order Summary</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.name }}</strong>
+                            {% if item.notes %}
+                            <br><small class="item-notes">{{ item.notes }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>${{ "%.2f"|format(item.total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Total</strong></td>
+                        <td><strong>${{ "%.2f"|format(order.total) }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            {% if order.customer_name %}
+            <p><strong>Customer:</strong> {{ order.customer_name }}</p>
+            {% endif %}
+            <p><strong>Payment Type:</strong> <span class="badge badge-{{ order.payment_type }}">{{ order.payment_type }}</span></p>
+        </div>
+        
+        <div class="payment-form-section">
+            <h2>Payment</h2>
+            
+            <form method="POST" class="payment-form">
+                {% if order.payment_type == 'cash' %}
+                <div class="form-group">
+                    <label for="amount_paid">Amount Received ($)</label>
+                    <input type="number" id="amount_paid" name="amount_paid" 
+                           step="0.01" min="{{ order.total }}" required autofocus
+                           placeholder="Enter amount received">
+                </div>
+                
+                <div id="change-display" class="change-info" style="display: none;">
+                    <p><strong>Change Due:</strong> <span id="change-amount">$0.00</span></p>
+                </div>
+                
+                {% if order.customer_name %}
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="add_to_credit" value="yes" id="add_to_credit">
+                        Add change to customer credit
+                    </label>
+                </div>
+                {% endif %}
+                
+                <script>
+                const totalAmount = {{ order.total }};
+                document.getElementById('amount_paid').addEventListener('input', function() {
+                    const paid = parseFloat(this.value) || 0;
+                    const change = paid - totalAmount;
+                    if (change > 0) {
+                        document.getElementById('change-display').style.display = 'block';
+                        document.getElementById('change-amount').textContent = '$' + change.toFixed(2);
+                    } else {
+                        document.getElementById('change-display').style.display = 'none';
+                    }
+                });
+                </script>
+                
+                {% elif order.payment_type == 'credit' %}
+                {% if insufficient_credit %}
+                <div class="alert alert-warning">
+                    <p><strong>Insufficient Credit</strong></p>
+                    <p>Customer has: ${{ "%.2f"|format(customer_credit) }}</p>
+                    <p>Order total: ${{ "%.2f"|format(order.total) }}</p>
+                    <p>Additional needed: ${{ "%.2f"|format(order.total - customer_credit) }}</p>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="use_partial_credit" value="yes" id="use_partial_credit">
+                        Use available credit and pay difference with cash
+                    </label>
+                </div>
+                
+                <div id="cash-payment-section" style="display: none;">
+                    <div class="form-group">
+                        <label for="cash_amount">Cash Amount ($)</label>
+                        <input type="number" id="cash_amount" name="cash_amount" 
+                               step="0.01" min="{{ order.total - customer_credit }}"
+                               placeholder="Enter cash amount">
+                    </div>
+                </div>
+                
+                <script>
+                document.getElementById('use_partial_credit').addEventListener('change', function() {
+                    document.getElementById('cash-payment-section').style.display = 
+                        this.checked ? 'block' : 'none';
+                });
+                </script>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>Using customer credit: ${{ "%.2f"|format(customer_credit) }}</p>
+                    <p>Remaining after payment: ${{ "%.2f"|format(customer_credit - order.total) }}</p>
+                </div>
+                {% endif %}
+                {% endif %}
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        Complete Payment
+                    </button>
+                    <a href="{{ url_for('create_order') }}" class="btn btn-secondary">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,23 +1,28 @@
 # Cafe POS System
 
-A simple Point of Sale (POS) system for small cafes that allows baristas to manage orders, process transactions, and track customer credits.
+A web-based Point of Sale (POS) system for small cafes that allows baristas to manage orders, process transactions, and track customer credits.
 
 ## Features
 
-- **Order Management**: Record customer orders with multiple items
-- **Item Management**: Add and manage menu items with prices
+- **Barista Login System**: Secure login for staff members
+- **Web-Based UI**: Modern, responsive interface accessible from any device
+- **Order Management**: 
+  - Select items from menu
+  - Enter quantity for each item
+  - Add notes for special requests (e.g., "extra hot", "no sugar")
+- **Customer Tracking**: Track customer accounts and credit balances
 - **Transaction Processing**: 
-  - Process cash transactions
+  - Process cash payments with change calculation
   - Process credit transactions using customer accounts
   - Mixed payments (credit + cash)
-- **Customer Credit Tracking**: 
-  - Automatically track credits when customers overpay
-  - Deduct from credit balance for future purchases
-- **Data Persistence**: All data is saved in JSON files
+- **Item Management**: Add, view, and delete menu items
+- **Dashboard**: View recent transactions and system statistics
+- **Data Persistence**: All data saved in JSON files
 
 ## Requirements
 
-- Python 3.6 or higher
+- Python 3.7 or higher
+- Flask 2.3.0 or higher
 
 ## Installation
 
@@ -27,72 +32,103 @@ git clone https://github.com/andrxke/cafe-pos.git
 cd cafe-pos
 ```
 
-2. Run the application:
+2. Install dependencies:
 ```bash
-python3 pos.py
+pip install -r requirements.txt
 ```
+
+3. Run the application:
+```bash
+python app.py
+```
+
+4. Open your browser and navigate to:
+```
+http://localhost:5000
+```
+
+## Default Login
+
+- **Username**: `admin`
+- **Password**: `admin123`
+
+*Note: Change these credentials in production*
 
 ## Usage
 
-### Main Menu
+### Logging In
 
-When you start the application, you'll see the main menu:
-
-```
-=== MAIN MENU ===
-1. Create Order
-2. Add Item to Menu
-3. View Menu
-4. View Customers
-5. Exit
-```
-
-### Adding Items
-
-1. Select option `2` from the main menu
-2. Enter the item name (e.g., "Espresso")
-3. Enter the price (e.g., "3.50")
+1. Open the application in your browser
+2. Enter your barista credentials
+3. Click "Login"
 
 ### Creating an Order
 
-1. Select option `1` from the main menu
-2. Enter item names from the menu (one at a time)
-3. Type "done" when finished adding items
-4. Choose payment method:
-   - **Cash**: Enter the amount received, system calculates change
+1. Click "New Order" from the dashboard or navigation
+2. For each item:
+   - Enter the quantity
+   - Add any special notes/requests
+3. Enter customer name (optional, but required for credit tracking)
+4. Select payment type (Cash or Customer Credit)
+5. Click "Proceed to Payment"
+6. Complete the payment:
+   - **Cash**: Enter amount received, system calculates change
      - Option to add change to customer credit
-   - **Credit**: Use customer's account credit balance
-     - If insufficient credit, option to pay difference in cash
+   - **Credit**: Uses customer's credit balance
+     - If insufficient, option to pay difference with cash
 
-### Viewing Menu and Customers
+### Managing Menu Items
 
-- Select option `3` to view all menu items and prices
-- Select option `4` to view all customers and their credit balances
+1. Navigate to "Menu Items"
+2. Click "+ Add Item" to add new items
+3. Enter item name and price
+4. Click "Add Item"
+5. To delete an item, click "Delete" on any item card
+
+### Viewing Customers
+
+1. Navigate to "Customers"
+2. View all customers and their credit balances
+3. Customers are automatically created when processing orders
 
 ## Data Storage
 
-All data is stored in the `data/` directory:
+All data is stored in the `data/` directory as JSON files:
 - `items.json`: Menu items and prices
 - `customers.json`: Customer accounts and credit balances
 - `transactions.json`: Transaction history
+- `baristas.json`: Barista login credentials
 
 ## Example Workflow
 
-1. **Add menu items**:
-   - Add "Espresso" for $3.50
-   - Add "Cappuccino" for $4.00
-   - Add "Muffin" for $2.50
+1. **Barista logs in** with credentials
+2. **Add menu items** (one-time setup):
+   - Espresso: $3.50
+   - Cappuccino: $4.00
+   - Muffin: $2.50
 
-2. **Process an order**:
-   - Customer orders 1 Espresso and 1 Muffin (Total: $6.00)
+3. **Customer orders**:
+   - 1x Cappuccino
+   - 1x Muffin
+   - Notes: "Extra hot cappuccino"
+   - Total: $6.50
+
+4. **Payment**:
    - Customer pays $10.00 cash
-   - Change: $4.00
-   - Add change to customer's (e.g., "John") credit account
+   - Change: $3.50
+   - Add change to customer's credit account
 
-3. **Use credit for next order**:
-   - John orders 1 Cappuccino ($4.00)
-   - Pay with credit (uses John's $4.00 credit)
-   - Transaction complete, credit balance: $0.00
+5. **Next visit**:
+   - Customer has $3.50 credit
+   - Orders 1x Espresso ($3.50)
+   - Pays with credit
+   - Transaction complete
+
+## Security Notes
+
+- The default secret key should be changed in production
+- Passwords are hashed using Werkzeug's security functions
+- Always use HTTPS in production environments
 
 ## License
 

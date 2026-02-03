@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Cafe POS{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <h1>☕ Cafe POS System</h1>
+        <h2>Barista Login</h2>
+        
+        <form method="POST" class="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        
+        <div class="login-help">
+            <p><small>Default credentials: <strong>admin</strong> / <strong>admin123</strong></small></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

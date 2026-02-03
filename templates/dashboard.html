@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cafe POS{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Dashboard</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Menu Items</h3>
+            <div class="stat-number">{{ items|length }}</div>
+            <a href="{{ url_for('items') }}" class="stat-link">View all →</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Customers</h3>
+            <div class="stat-number">{{ customers|length }}</div>
+            <a href="{{ url_for('customers') }}" class="stat-link">View all →</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Transactions</h3>
+            <div class="stat-number">{{ recent_transactions|length }}</div>
+            <span class="stat-subtitle">Recent orders</span>
+        </div>
+        
+        <div class="stat-card stat-card-primary">
+            <h3>New Order</h3>
+            <a href="{{ url_for('create_order') }}" class="btn btn-primary btn-large">
+                Create Order →
+            </a>
+        </div>
+    </div>
+    
+    {% if recent_transactions %}
+    <div class="recent-transactions">
+        <h2>Recent Transactions</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Items</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Barista</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in recent_transactions %}
+                <tr>
+                    <td>{{ transaction.timestamp[:19].replace('T', ' ') }}</td>
+                    <td>
+                        {% for item in transaction.items %}
+                            {{ item.name }} (x{{ item.quantity }}){% if item.notes %} - {{ item.notes }}{% endif %}
+                            {% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ transaction.customer_name or '-' }}</td>
+                    <td>${{ "%.2f"|format(transaction.total) }}</td>
+                    <td><span class="badge badge-{{ transaction.payment_type }}">{{ transaction.payment_type }}</span></td>
+                    <td>{{ transaction.barista }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

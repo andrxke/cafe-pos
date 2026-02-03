@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Customers - Cafe POS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Customers</h1>
+</div>
+
+{% if customers %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Credit Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for name, customer in customers.items()|sort %}
+        <tr>
+            <td><strong>{{ customer.name }}</strong></td>
+            <td>
+                <span class="credit-amount {% if customer.credit > 0 %}credit-positive{% endif %}">
+                    ${{ "%.2f"|format(customer.credit) }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <p>No customers yet.</p>
+    <p>Customers are automatically added when processing orders.</p>
+</div>
+{% endif %}
+{% endblock %}
