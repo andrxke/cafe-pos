@@ -1,2 +1,2 @@
-# cafe-pos
-A simple POS system for small cafes 
+# OpenCafe
+A free open source simple POS system for small cafes 
