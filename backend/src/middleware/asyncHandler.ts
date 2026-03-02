@@ -1,0 +1,11 @@
+// c:\Coding\OpenCafe\cafe-pos\backend\src\middleware\asyncHandler.ts
+import type { NextFunction, Request, Response } from 'express';
+
+export function asyncHandler(
+  handler: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    void handler(req, res, next).catch(next);
+  };
+}
+

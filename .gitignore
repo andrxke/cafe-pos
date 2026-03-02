@@ -1,0 +1,9 @@
+# c:\Coding\OpenCafe\cafe-pos\.gitignore
+node_modules
+dist
+.angular
+.vercel
+.env
+coverage
+npm-debug.log*
+
